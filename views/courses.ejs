@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .section-item {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: #f9fafb;
+        }
+        .lecture-item {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #ffffff;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-white text-xl font-bold">
+                        Edemy Admin
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                    </a>
+                    <a href="/admin/users"
+                        class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
+                        Users
+                    </a>
+                    <a href="/admin/courses" class="text-white bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">
+                        Courses
+                    </a>
+                    <a href="/admin/quizzes"
+                        class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
+                        Quizzes
+                    </a>
+                    <form action="/admin/logout" method="POST" class="inline">
+                        <button type="submit"
+                            class="text-white hover:text-red-200 px-3 py-2 rounded-md text-sm font-medium border border-white/20 hover:border-red-300 transition-colors">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <main class="max-w-7xl mx-auto py-6 px-4">
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Course Management</h1>
+                        <p class="text-sm text-gray-500 mt-1">Total Courses: <span class="font-semibold text-green-600">
+                                <%= courses.length %>
+                            </span></p>
+                    </div>
+                    <button onclick="openCreateModal()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                        + Create New Course
+                    </button>
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="coursesList">
+                    <% courses.forEach((course, index)=> { %>
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div class="relative">
+                                <img src="<%= course.thumbnail %>" alt="<%= course.title %>"
+                                    class="w-full h-48 object-cover rounded-t-lg">
+                                <div
+                                    class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-sm font-semibold">
+                                    $<%= course.price %>
+                                </div>
+                                <div class="absolute top-2 left-2">
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                        <%= course.category %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="p-4">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                    <%= course.title %>
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-2">
+                                    Instructor: <%= course.instructor %>
+                                </p>
+
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                    <span>Duration: <%= course.duration %></span>
+                                    <span>
+                                        <%= course.lessons %> lessons
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                                        <%= course.level %>
+                                    </span>
+                                    <div class="text-right">
+                                        <div class="text-lg font-bold text-green-600">$<%= course.price %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 pt-3 border-t border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-3">
+                                        Created: <%= new Date(course.createdAt).toLocaleDateString() %>
+                                    </div>
+                                    <div class="flex gap-2 mb-2">
+                                        <button onclick='editCourse("<%= course._id %>")' 
+                                            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-2 px-3 rounded">
+                                            Edit
+                                        </button>
+                                        <button onclick='deleteCourse("<%= course._id %>")' 
+                                            class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-2 px-3 rounded">
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <a href="/admin/courses/<%= course._id %>/quizzes" 
+                                        class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-2 px-3 rounded text-center block">
+                                        Manage Quizzes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+
+
+                <% if (courses.length===0) { %>
+                    <div class="text-center py-12">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
+                        <p class="text-gray-500 mb-4">Create your first course to get started.</p>
+                        <button onclick="openCreateModal()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                            Create Course
+                        </button>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Course Modal -->
+    <div id="courseModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-5xl shadow-lg rounded-md bg-white mb-10">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Create New Course</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-2xl">&times;</span>
+                    </button>
+                </div>
+
+                <form id="courseForm" onsubmit="handleSubmit(event)">
+                    <input type="hidden" id="courseId" name="courseId">
+
+                    <!-- Basic Information -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h4>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Course Title *</label>
+                            <input type="text" id="title" name="title" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subtitle *</label>
+                            <input type="text" id="subtitle" name="subtitle" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                            <textarea id="description" name="description" rows="4" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Instructor *</label>
+                                <input type="text" id="instructor" name="instructor" required value="Edemy"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                <input type="text" id="category" name="category" required placeholder="e.g., Web Development, Security"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Level *</label>
+                                <select id="level" name="level" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Language *</label>
+                                <input type="text" id="language" name="language" required value="English"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Pricing</h4>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Current Price ($) *</label>
+                                <input type="number" id="price" name="price" min="0" step="0.01" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Original Price ($) *</label>
+                                <input type="number" id="originalPrice" name="originalPrice" min="0" step="0.01" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Details -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Course Details</h4>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Duration *</label>
+                                <input type="text" id="duration" name="duration" required placeholder="e.g., 42 hours"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Number of Lessons *</label>
+                                <input type="number" id="lessons" name="lessons" min="1" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Thumbnail URL *</label>
+                            <input type="url" id="thumbnail" name="thumbnail" required placeholder="https://example.com/image.jpg"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Enter a valid image URL for the course thumbnail</p>
+                        </div>
+                    </div>
+
+                    <!-- Ratings & Statistics -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Ratings & Statistics</h4>
+                        
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rating (0-5) *</label>
+                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="0"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Average rating out of 5</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Review Count</label>
+                                <input type="number" id="reviewCount" name="reviewCount" min="0" value="0"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Number of reviews</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Student Count</label>
+                                <input type="number" id="studentCount" name="studentCount" min="0" value="0"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Number of enrolled students</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Syllabus -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">Course Structure (Syllabus)</h4>
+                            <button type="button" onclick="addSection()" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                + Add Section
+                            </button>
+                        </div>
+                        <div id="syllabusContainer"></div>
+                    </div>
+
+                    <!-- Learning Outcomes -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">What You'll Learn</h4>
+                        <div id="learningOutcomesContainer">
+                            <div class="mb-2 flex gap-2">
+                                <input type="text" id="learningOutcomeInput" placeholder="What students will learn"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="button" onclick="addLearningOutcome()" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Add</button>
+                            </div>
+                            <div id="learningOutcomesList" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Requirements</h4>
+                        <div id="requirementsContainer">
+                            <div class="mb-2 flex gap-2">
+                                <input type="text" id="requirementInput" placeholder="Course requirement or prerequisite"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="button" onclick="addRequirement()" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Add</button>
+                            </div>
+                            <div id="requirementsList" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end gap-3">
+                        <button type="button" onclick="closeModal()" 
+                            class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Save Course
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let learningOutcomes = [];
+        let requirements = [];
+        let syllabus = [];
+        let sectionCounter = 0;
+        let lectureCounter = 0;
+
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create New Course';
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = '';
+            learningOutcomes = [];
+            requirements = [];
+            syllabus = [];
+            sectionCounter = 0;
+            lectureCounter = 0;
+            updateLearningOutcomesDisplay();
+            updateRequirementsDisplay();
+            updateSyllabusDisplay();
+            document.getElementById('courseModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('courseModal').classList.add('hidden');
+        }
+
+        async function editCourse(courseId) {
+            try {
+                const response = await fetch(`/api/courses/${courseId}`);
+                const course = await response.json();
+                
+                document.getElementById('modalTitle').textContent = 'Edit Course';
+                document.getElementById('courseId').value = course._id;
+                document.getElementById('title').value = course.title;
+                document.getElementById('subtitle').value = course.subtitle;
+                document.getElementById('description').value = course.description;
+                document.getElementById('instructor').value = course.instructor;
+                document.getElementById('category').value = course.category;
+                document.getElementById('level').value = course.level;
+                document.getElementById('language').value = course.language;
+                document.getElementById('price').value = course.price;
+                document.getElementById('originalPrice').value = course.originalPrice;
+                document.getElementById('duration').value = course.duration;
+                document.getElementById('lessons').value = course.lessons;
+                document.getElementById('thumbnail').value = course.thumbnail;
+                document.getElementById('rating').value = course.rating || 0;
+                document.getElementById('reviewCount').value = course.reviewCount || 0;
+                document.getElementById('studentCount').value = course.studentCount || 0;
+
+                learningOutcomes = course.learningOutcomes || [];
+                requirements = course.requirements || [];
+                syllabus = (course.syllabus || []).map((section, sIdx) => ({
+                    id: sIdx,
+                    section: section.section || '',
+                    lectures: (section.lectures || []).map((lecture, lIdx) => ({
+                        id: lIdx,
+                        title: lecture.title || '',
+                        duration: lecture.duration || '',
+                        videoId: lecture.videoId || '',
+                        description: lecture.description || ''
+                    }))
+                }));
+                sectionCounter = syllabus.length;
+                lectureCounter = syllabus.reduce((max, s) => Math.max(max, ...(s.lectures.map(l => l.id))), 0) + 1;
+
+                updateLearningOutcomesDisplay();
+                updateRequirementsDisplay();
+                updateSyllabusDisplay();
+                document.getElementById('courseModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error fetching course:', error);
+                alert('Failed to load course details');
+            }
+        }
+
+        async function deleteCourse(courseId) {
+            if (!confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/courses/${courseId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to delete course: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error deleting course:', error);
+                alert('Failed to delete course');
+            }
+        }
+
+        function addLearningOutcome() {
+            const input = document.getElementById('learningOutcomeInput');
+            const value = input.value.trim();
+            if (value) {
+                learningOutcomes.push(value);
+                input.value = '';
+                updateLearningOutcomesDisplay();
+            }
+        }
+
+        function removeLearningOutcome(index) {
+            learningOutcomes.splice(index, 1);
+            updateLearningOutcomesDisplay();
+        }
+
+        function updateLearningOutcomesDisplay() {
+            const container = document.getElementById('learningOutcomesList');
+            container.innerHTML = '';
+            learningOutcomes.forEach((outcome, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-white p-2 rounded border border-gray-200';
+                div.innerHTML = `
+                    <span class="text-sm text-gray-700">${outcome}</span>
+                    <button type="button" onclick="removeLearningOutcome(${index})" 
+                        class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addRequirement() {
+            const input = document.getElementById('requirementInput');
+            const value = input.value.trim();
+            if (value) {
+                requirements.push(value);
+                input.value = '';
+                updateRequirementsDisplay();
+            }
+        }
+
+        function removeRequirement(index) {
+            requirements.splice(index, 1);
+            updateRequirementsDisplay();
+        }
+
+        function updateRequirementsDisplay() {
+            const container = document.getElementById('requirementsList');
+            container.innerHTML = '';
+            requirements.forEach((requirement, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-white p-2 rounded border border-gray-200';
+                div.innerHTML = `
+                    <span class="text-sm text-gray-700">${requirement}</span>
+                    <button type="button" onclick="removeRequirement(${index})" 
+                        class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addSection() {
+            const sectionId = sectionCounter++;
+            syllabus.push({
+                id: sectionId,
+                section: '',
+                lectures: []
+            });
+            updateSyllabusDisplay();
+        }
+
+        function removeSection(sectionId) {
+            syllabus = syllabus.filter(s => s.id !== sectionId);
+            updateSyllabusDisplay();
+        }
+
+        function addLecture(sectionId) {
+            const lectureId = lectureCounter++;
+            const section = syllabus.find(s => s.id === sectionId);
+            if (section) {
+                section.lectures.push({
+                    id: lectureId,
+                    title: '',
+                    duration: '',
+                    videoId: '',
+                    description: ''
+                });
+                updateSyllabusDisplay();
+            }
+        }
+
+        function removeLecture(sectionId, lectureId) {
+            const section = syllabus.find(s => s.id === sectionId);
+            if (section) {
+                section.lectures = section.lectures.filter(l => l.id !== lectureId);
+                updateSyllabusDisplay();
+            }
+        }
+
+        function updateSyllabusDisplay() {
+            const container = document.getElementById('syllabusContainer');
+            container.innerHTML = '';
+            
+            if (syllabus.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500">No sections added yet. Click "Add Section" to get started.</p>';
+                return;
+            }
+
+            syllabus.forEach((section, sIdx) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section-item';
+                sectionDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <input type="text" 
+                            onchange="updateSectionName(${section.id}, this.value)"
+                            value="${section.section || ''}" 
+                            placeholder="Section name (e.g., Security Fundamentals)"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                        <button type="button" onclick="removeSection(${section.id})" 
+                            class="ml-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm">
+                            Remove Section
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" onclick="addLecture(${section.id})" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm">
+                            + Add Lecture
+                        </button>
+                    </div>
+                    <div id="lectures-${section.id}" class="space-y-2"></div>
+                `;
+                container.appendChild(sectionDiv);
+
+                const lecturesContainer = document.getElementById(`lectures-${section.id}`);
+                section.lectures.forEach((lecture) => {
+                    const lectureDiv = document.createElement('div');
+                    lectureDiv.className = 'lecture-item';
+                    lectureDiv.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Lecture</span>
+                            <button type="button" onclick="removeLecture(${section.id}, ${lecture.id})" 
+                                class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <input type="text" 
+                                onchange="updateLectureField(${section.id}, ${lecture.id}, 'title', this.value)"
+                                value="${lecture.title || ''}" 
+                                placeholder="Lecture Title"
+                                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <input type="text" 
+                                onchange="updateLectureField(${section.id}, ${lecture.id}, 'duration', this.value)"
+                                value="${lecture.duration || ''}" 
+                                placeholder="Duration (e.g., 2.5 hours)"
+                                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" 
+                                onchange="updateLectureField(${section.id}, ${lecture.id}, 'videoId', this.value)"
+                                value="${lecture.videoId || ''}" 
+                                placeholder="Video ID or URL"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        </div>
+                        <div>
+                            <textarea 
+                                onchange="updateLectureField(${section.id}, ${lecture.id}, 'description', this.value)"
+                                placeholder="Lecture Description (optional)"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                rows="2">${lecture.description || ''}</textarea>
+                        </div>
+                    `;
+                    lecturesContainer.appendChild(lectureDiv);
+                });
+            });
+        }
+
+        function updateSectionName(sectionId, value) {
+            const section = syllabus.find(s => s.id === sectionId);
+            if (section) {
+                section.section = value;
+            }
+        }
+
+        function updateLectureField(sectionId, lectureId, field, value) {
+            const section = syllabus.find(s => s.id === sectionId);
+            if (section) {
+                const lecture = section.lectures.find(l => l.id === lectureId);
+                if (lecture) {
+                    lecture[field] = value;
+                }
+            }
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            const courseId = document.getElementById('courseId').value;
+            const formData = {
+                title: document.getElementById('title').value,
+                subtitle: document.getElementById('subtitle').value,
+                description: document.getElementById('description').value,
+                instructor: document.getElementById('instructor').value,
+                category: document.getElementById('category').value,
+                level: document.getElementById('level').value,
+                language: document.getElementById('language').value,
+                price: parseFloat(document.getElementById('price').value),
+                originalPrice: parseFloat(document.getElementById('originalPrice').value),
+                duration: document.getElementById('duration').value,
+                lessons: parseInt(document.getElementById('lessons').value),
+                thumbnail: document.getElementById('thumbnail').value,
+                rating: parseFloat(document.getElementById('rating').value) || 0,
+                reviewCount: parseInt(document.getElementById('reviewCount').value) || 0,
+                studentCount: parseInt(document.getElementById('studentCount').value) || 0,
+                learningOutcomes: learningOutcomes,
+                requirements: requirements,
+                syllabus: syllabus.map(s => ({
+                    section: s.section,
+                    lectures: s.lectures.map(l => ({
+                        title: l.title,
+                        duration: l.duration,
+                        videoId: l.videoId,
+                        description: l.description
+                    }))
+                }))
+            };
+
+            try {
+                const url = courseId ? `/api/courses/${courseId}` : '/api/courses';
+                const method = courseId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Failed to save course: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error saving course:', error);
+                alert('Failed to save course');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

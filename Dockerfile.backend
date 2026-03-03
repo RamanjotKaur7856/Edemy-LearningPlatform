@@ -1,0 +1,18 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy application files
+COPY . .
+
+# Expose the port (using environment variable or default to 5002)
+EXPOSE 5002
+
+# Use node to run the server
+CMD ["node", "server.js"]
